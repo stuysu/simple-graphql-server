@@ -78,7 +78,7 @@ const resolvers = {
     Mutation: {
         addUser: (root, params, context) => {
             const {name, email} = params;
-            const id = users.length;
+            const id = users.length + 1;
 
             const newUser = {
                 id,
@@ -91,7 +91,7 @@ const resolvers = {
         },
         addHobby: (root, params, context) => {
             const {userId, name, frequency} = params;
-            const id = hobbies.length;
+            const id = hobbies.length + 1;
 
             const newHobby = { id, userId, name, frequency };
             hobbies.push(newHobby);
