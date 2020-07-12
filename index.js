@@ -49,7 +49,7 @@ const typeDefs = gql`
         getHobby(id: Int!): Hobby
     }
     
-    type Manipulation {
+    type Mutation {
         addUser(name: String!, email: String!): User
         addHobby(userId: Int!, name: String!, frequency: String!): Hobby
     }
@@ -75,7 +75,7 @@ const resolvers = {
             return hobbies.find(hobby => hobby.id === id);
         }
     },
-    Manipulation: {
+    Mutation: {
         addUser: (root, params, context) => {
             const {name, email} = params;
             const id = users.length;
