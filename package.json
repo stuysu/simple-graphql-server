@@ -11,6 +11,10 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "apollo-server": "^2.15.1"
+    "apollo-server": "^2.15.1",
+    "mysql2": "^2.2.5",
+    "sequelize": "^6.3.5",
+    "sequelize-cli": "^6.2.0",
+    "sqlite3": "^5.0.0"
   }
 }

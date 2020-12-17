@@ -1,108 +1,73 @@
 const { ApolloServer, gql } = require('apollo-server');
+const { users, hobbies } = require("./models");
 
-// Imagine this is a database table
-const users = [
-    {
-        id: 1,
-        name: "John Doe",
-        email: "john@stuysu.org"
+// How to use includes
+users.findOne({
+    where: {
+        id: 1
+    },
+    include: {
+        model : hobbies
     }
-];
-
-// Imagine this is a database table
-const hobbies = [
-    {
-        id: 1,
-        userId: 1,
-        name: "swimming",
-        frequency: "once a week"
-    },
-    {
-        id: 2,
-        userId: 1,
-        name: "photography",
-        frequency: "once a month"
-    },
-];
+}).then(console.log);
 
 // Exclamation mark after something means it's required
-const typeDefs = gql`
+const typeDefs = gql`  
     type User {
         id: Int!
-        name: String!
-        email: String!
-        
-        # The hobbies property is an array of Hobby objects
-        hobbies: [Hobby]!
-    }
-    
-    type Hobby {
-        name: String!
-        frequency: String!
-        
-        # This property is the user the hobby belongs to
-        user: User
+        name: String
+        greeting: String
+        email: String
     }
     
     type Query {
-        getUser(email: String!): User
-        getHobby(id: Int!): Hobby
+        user(id: Int!): User
     }
     
     type Mutation {
         addUser(name: String!, email: String!): User
-        addHobby(userId: Int!, name: String!, frequency: String!): Hobby
     }
+    
 `;
-const resolvers = {
-    User: {
-        hobbies: (user) => {
-            return hobbies.filter(hobby => hobby.userId === user.id);
-        }
-    },
-    Hobby: {
-        user: (hobby) => {
-            return users.find(user => user.id === hobby.userId);
-        }
-    },
-    Query: {
-        getUser: (root, params, context) => {
-            const email = params.email;
-            return users.find(user => user.email === email);
-        },
-        getHobby: (root, params, context) => {
-            const id = params.id;
-            return hobbies.find(hobby => hobby.id === id);
-        }
-    },
-    Mutation: {
-        addUser: (root, params, context) => {
-            const {name, email} = params;
-            const id = users.length + 1;
 
-            const newUser = {
-                id,
-                name,
-                email
-            };
-            users.push(newUser);
 
-            return newUser;
-        },
-        addHobby: (root, params, context) => {
-            const {userId, name, frequency} = params;
-            const id = hobbies.length + 1;
 
-            const newHobby = { id, userId, name, frequency };
-            hobbies.push(newHobby);
-            return newHobby;
-        }
-    }
-}
+const asyncHello = () => {
+    return new Promise(resolve => {
+       setTimeout(() => resolve("Hello"), 1500);
+    });
+};
+
 
 const apolloServer = new ApolloServer({
     typeDefs,
-    resolvers
+    resolvers:{
+        Query: {
+            user: (parent, args, context) => {
+
+                return users.findOne({
+                    where: {
+                        id: args.id
+                    }
+                })
+            }
+        },
+        User: {
+            greeting: (user, args, context) => {
+                return `Hello ${user.name}`;
+            }
+        },
+        Mutation: {
+            addUser(parent, {name, email}, ) {
+                return users.create({
+                    name, email
+                });
+            }
+        }
+    },
+    context: (context) => {
+        return {request: context.req};
+    }
 });
 
 apolloServer.listen(3001).then(() => console.log("listening on port 3001"));
